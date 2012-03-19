@@ -7,14 +7,14 @@
  * @subpackage		logger
  * @author			David Kelly
  * @copyright		David Kelly, 2012 (http://opensourceame.com)
- * @version			2.6.3
+ * @version			2.6.4
  */
 
 namespace opensourceame;
 
 class autoloader
 {
-	const			version			= '2.6.3';
+	const			version			= '2.6.4';
 
 	static			$instance		= null;
 
@@ -103,6 +103,24 @@ class autoloader
 		return true;
 	}
 
+	
+	public function includePath($path)
+	{
+		if (is_array($path))
+		{
+			foreach ($path as $p)
+			{
+				$this->includePath($p);
+			}
+		}
+	
+		$this->include[] = realpath($path);
+	
+		return true;
+	}
+	
+	
+	
 	private function createCacheLockFile()
 	{
 		$lockFile = $this->getCacheLockFilename();
