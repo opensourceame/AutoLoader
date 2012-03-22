@@ -7,14 +7,14 @@
  * @subpackage		logger
  * @author			David Kelly
  * @copyright		David Kelly, 2012 (http://opensourceame.com)
- * @version			2.6.4
+ * @version			2.6.5
  */
 
 namespace opensourceame;
 
 class autoloader
 {
-	const			version			= '2.6.4';
+	const			version			= '2.6.5';
 
 	static			$instance		= null;
 
@@ -276,6 +276,8 @@ class autoloader
 
 				// TODO: delete the lock file if it is older than a specified number of seconds
 
+				$waitCount = 0;
+				
 				while (! file_exists($this->getCacheFileName()))
 				{
 					// TODO: check how long the lock file has been hanging around and delete if necessary
