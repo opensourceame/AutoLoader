@@ -191,6 +191,7 @@ class autoloader
 
     public function loadClass($class)
 	{
+		$unformatted_classname = $class;
 		$class = $this->formatClassName($class);
 
 		$this->debug("loading $class");
@@ -200,8 +201,33 @@ class autoloader
 			require_once $this->index[$class];
 
 			return true;
-		}
+		
+		} else { // class is not found : searching the file through the include paths
+			
+			foreach ($this->include as $path)
+			{
+				$files 	= $this->glob_recursive("$path/*.php");
+			
+				foreach ($files as $file) {
 
+					if (basename($file, ".php") === $unformatted_classname ) {
+
+						// class is found : generating a new cache file
+						$this->initialised = false;
+						unlink($this->getCacheFileName());
+						$this->init();
+
+						require_once $file;
+						
+						return true;
+					}
+
+				}
+
+			}
+	
+		}
+		// file not found
 		return false;
 	}
 
