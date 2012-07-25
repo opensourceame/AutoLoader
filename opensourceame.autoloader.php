@@ -140,7 +140,8 @@ class autoloader
 
 		$cacheFile = $this->getCacheFileName();
 
-		unlink($this->getCacheLockFileName());
+		if (file_exists($this->getCacheLockFileName()))
+			unlink($this->getCacheLockFileName());
 
 		$cacheContent  = "<?php\n";
 		$cacheContent .= '$index = ' . var_export($this->index, true) . ";\n";
