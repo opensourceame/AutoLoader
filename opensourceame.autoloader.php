@@ -7,14 +7,14 @@
  * @subpackage		logger
  * @author			David Kelly
  * @copyright		David Kelly, 2012 (http://opensourceame.com)
- * @version			2.6.5
+ * @version			2.7.0
  */
 
 namespace opensourceame;
 
 class autoloader
 {
-	const			version			= '2.6.5';
+	const			version			= '2.7.0';
 
 	static			$instance		= null;
 
@@ -32,12 +32,15 @@ class autoloader
 	private			$exclude;
 	private			$ignore;
 
+	private			$missingClasses 		= array();
+	private			$missingRefreshInterval	= 60;
+
 	private			$configDefaults	= array(
 		'debug'			=> false,
 		'cache'			=> true,
 		'cacheDir'		=> '/tmp',
 		'cacheMaxAge'	=> 600,
-		'cacheMethod'	=> 'serialize',
+		'cacheMethod'	=> 'include',
 		'exclude'		=> array(),
 		'include'		=> array(),
 		'ignore'		=> array(),
@@ -103,7 +106,7 @@ class autoloader
 		return true;
 	}
 
-	
+
 	public function includePath($path)
 	{
 		if (is_array($path))
@@ -113,14 +116,14 @@ class autoloader
 				$this->includePath($p);
 			}
 		}
-	
+
 		$this->include[] = realpath($path);
-	
+
 		return true;
 	}
-	
-	
-	
+
+
+
 	private function createCacheLockFile()
 	{
 		$lockFile = $this->getCacheLockFilename();
@@ -139,15 +142,19 @@ class autoloader
 
 		unlink($this->getCacheLockFileName());
 
-		if ($this->cacheMethod = 'include')
+		if ($this->cacheMethod == 'include')
 		{
-			$cacheContent = '<?php $index = ' . var_export($this->index, true) ."\n;";
-		} else {
-			$cacheContent = serialize($this->index);
+			$cacheContent  = "<?php\n";
+			$cacheContent .= '$index = ' . var_export($this->index, true) . ";\n";
+			$cacheContent .= '$missing = ' . var_export($this->missingClasses, true) . "; \n";
 		}
 
 		if (! file_put_contents($cacheFile, $cacheContent))
+		{
+			$this->debug("could not write cache to $cacheFile");
+
 			return false;
+		}
 
 		chmod($cacheFile, 0777);
 
@@ -166,18 +173,15 @@ class autoloader
 		if (! is_readable($cacheFile))
 			return false;
 
-		if ($this->cacheMethod == 'include')
-		{
-			include_once $this->getCacheFileName();
+		include_once $this->getCacheFileName();
 
-			$this->index = $index;
-		} else {
-			$this->index = unserialize(file_get_contents($cacheFile));
-		}
-
-		$this->cacheRead = true;
+		$this->index 			= $index;
+		$this->missingClasses 	= $missing;
+		$this->cacheRead 		= true;
 
 		$this->debug("read cache from $cacheFile");
+		$this->debug(count($this->index) . " classes loaded");
+		$this->debug(count($this->missingClasses) . " classes missing");
 
 		return true;
 
@@ -185,8 +189,12 @@ class autoloader
 
 	protected function debug($message)
 	{
-		if ($this->debug)
-			return syslog(LOG_INFO, $message);
+		if (! $this->debug)
+			return false;
+
+		openlog('autoloader', false, LOG_USER);
+
+		return syslog(LOG_INFO, $message);
 	}
 
     public function loadClass($class)
@@ -201,33 +209,49 @@ class autoloader
 			require_once $this->index[$class];
 
 			return true;
-		
+
 		} else { // class is not found : searching the file through the include paths
-			
+
+			if (isset($this->missingClasses[$class]))
+			{
+				$timeMissing = time() - $this->missingClasses[$class];
+
+				if ( $timeMissing < $this->missingRefreshInterval)
+				{
+					$this->debug("$class has only been missing for $timeMissing seconds, not refreshing");
+
+					return false;
+				}
+			}
+
+			$this->debug("class not found, running search");
+
 			foreach ($this->include as $path)
 			{
 				$files 	= $this->glob_recursive("$path/*.php");
-			
+
 				foreach ($files as $file) {
 
 					if (basename($file, ".php") === $unformatted_classname ) {
 
-						// class is found : generating a new cache file
-						$this->initialised = false;
-						unlink($this->getCacheFileName());
-						$this->init();
+						$this->init(true);
 
 						require_once $file;
-						
+
 						return true;
 					}
-
 				}
-
 			}
-	
+
+			// class not found, mark this class as missing
+
+			$this->debug("class not found, marking as missing");
+
+			$this->missingClasses[$class] = time();
+
+			$this->writeCache();
 		}
-		// file not found
+
 		return false;
 	}
 
@@ -254,9 +278,9 @@ class autoloader
 		return true;
 	}
 
-	public function init()
+	public function init($forceInit = false)
 	{
-		if ($this->initialised)
+		if ($this->initialised and ! $forceInit)
 			return true;
 
 		$this->debug('initialising');
@@ -286,6 +310,16 @@ class autoloader
 			}
 		}
 
+		if ($forceInit)
+		{
+			if (is_writeable($this->getCacheFileName()))
+			{
+				unlink($this->getCacheFileName());
+
+				$this->debug("deleted cache");
+			}
+		}
+
 		if ($this->readCache())
 		{
 			$this->initialised = true;
@@ -303,7 +337,7 @@ class autoloader
 				// TODO: delete the lock file if it is older than a specified number of seconds
 
 				$waitCount = 0;
-				
+
 				while (! file_exists($this->getCacheFileName()))
 				{
 					// TODO: check how long the lock file has been hanging around and delete if necessary
