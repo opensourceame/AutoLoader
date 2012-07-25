@@ -142,12 +142,9 @@ class autoloader
 
 		unlink($this->getCacheLockFileName());
 
-		if ($this->cacheMethod == 'include')
-		{
-			$cacheContent  = "<?php\n";
-			$cacheContent .= '$index = ' . var_export($this->index, true) . ";\n";
-			$cacheContent .= '$missing = ' . var_export($this->missingClasses, true) . "; \n";
-		}
+		$cacheContent  = "<?php\n";
+		$cacheContent .= '$index = ' . var_export($this->index, true) . ";\n";
+		$cacheContent .= '$missing = ' . var_export($this->missingClasses, true) . "; \n";
 
 		if (! file_put_contents($cacheFile, $cacheContent))
 		{
