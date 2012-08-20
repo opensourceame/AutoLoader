@@ -226,7 +226,7 @@ class autoloader
 
 			foreach ($this->include as $path)
 			{
-				$files 	= $this->glob_recursive("$path/*.php");
+				$files 	= $this->glob_recursive("$path".DIRECTORY_SEPARATOR."*.php");
 
 				foreach ($files as $file) {
 
@@ -385,7 +385,7 @@ class autoloader
 			$ext = 'cache';
 		}
 
-		return $this->cacheDir . "/autoloader." . md5(serialize($tmp)) . ".$ext";
+		return $this->cacheDir . DIRECTORY_SEPARATOR . "autoloader." . md5(serialize($tmp)) . ".$ext";
 	}
 
 	public function getCacheLockFileName()
@@ -401,7 +401,7 @@ class autoloader
 
 		$this->pathsRead[] = $path;
 
-		$files 	= $this->glob_recursive("$path/*");
+		$files 	= $this->glob_recursive("$path".DIRECTORY_SEPARATOR."*");
 
 		foreach ($files as $file)
 		{
@@ -422,14 +422,15 @@ class autoloader
 
 	private function parseFile($filename)
 	{
+
 		$content 	= file($filename);
 		$namespace	= null;
 
 		foreach ($content as $line)
 		{
-			if(preg_match("/^\s*(namespace)\s+(.*).*;$/", $line, $matches))
+			if (preg_match("/^namespace\s*?(.*?)$/", $line, $matches))
 			{
-				$namespace = $matches[2];
+				$namespace = trim(str_replace(';', '', $matches[1]));
 			}
 
 			if(preg_match("/^\s*(abstract|final)*\s*(class|interface)\s+(\w*).*$/", $line, $matches))
@@ -481,7 +482,7 @@ class autoloader
 
 		$files = glob($pattern, $flags);
 
-		foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir)
+		foreach (glob(dirname($pattern).DIRECTORY_SEPARATOR.'*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir)
 		{
 			if (in_array($dir, $this->exclude))
 			{
@@ -490,7 +491,7 @@ class autoloader
 				continue;
 			}
 
-			$files = array_merge($files, $this->glob_recursive($dir.'/'.basename($pattern), $flags));
+			$files = array_merge($files, $this->glob_recursive($dir.DIRECTORY_SEPARATOR.basename($pattern), $flags));
 		}
 
 		return $files;
