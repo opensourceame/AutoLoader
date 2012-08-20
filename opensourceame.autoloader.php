@@ -7,14 +7,14 @@
  * @subpackage		logger
  * @author			David Kelly
  * @copyright		David Kelly, 2012 (http://opensourceame.com)
- * @version			2.7.0
+ * @version			2.7.1
  */
 
 namespace opensourceame;
 
 class autoloader
 {
-	const			version			= '2.7.0';
+	const			version			= '2.7.1';
 
 	static			$instance		= null;
 
@@ -427,12 +427,12 @@ class autoloader
 
 		foreach ($content as $line)
 		{
-			if(preg_match("/^\s*(namespace)\s+(.*).*;$/", $line, $matches))
+			if (preg_match("/^\s*(namespace)\s+(.*).*;$/", $line, $matches))
 			{
 				$namespace = $matches[2];
 			}
 
-			if(preg_match("/^\s*(abstract|final)*\s*(class|interface)\s+(\w*).*$/", $line, $matches))
+			if (preg_match("/^\s*(abstract|final)*\s*(class|interface|trait)\s+(\w*).*$/", $line, $matches))
 			{
 				$className = $matches[3];
 
