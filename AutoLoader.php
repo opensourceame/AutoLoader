@@ -2,23 +2,22 @@
 /**
  * An autoloader class that parses files and caches an index of classes to load
  *
- * @description		An autoloader class that parses files and caches an index of classes to load
- * @package 		opensourceame
- * @subpackage		logger
- * @author			David Kelly
- * @copyright		David Kelly, 2012 (http://opensourceame.com)
- * @version			3.0.0
+ * @description        An autoloader class that parses files and caches an index of classes to load
+ * @package         opensourceame
+ * @subpackage        logger
+ * @author            David Kelly
+ * @copyright        David Kelly, 2012 (http://opensourceame.com)
+ * @version            3.0.0
  */
 
 namespace opensourceame\AutoLoader;
 
 class Entity
 {
-    public			$location;
-    public			$status;
-    public			$lastCheckTime;
-    public			$lastCheckCount;
-    public			$version;
+    public            $location;
+    public            $status;
+    public            $lastCheckTime;
+    public            $lastCheckCount;
 
     /**
      * Set the properties of the entity
@@ -41,41 +40,40 @@ class Entity
 
 class AutoLoader
 {
-    const			version				= '3.0.0';
-    const			FOUND				= 1;
-    const			MISSING				= 2;
+    const       version                = '3.0.0';
+    const       FOUND                  = 1;
+    const       MISSING                = 2;
 
-    static			$instance			= null;
+    static      $instance              = null;
 
-    private			$extensions 		= array('php', 'inc');
-    private			$pathsRead			= array();
-    private			$pathsParsed		= array();
-    private			$initialised		= false;
+    private     $extensions            = array('php', 'inc');
+    private     $pathsRead             = array();
+    private     $pathsParsed           = array();
+    private     $initialised           = false;
 
-    private			$debug				= false;
-    private			$cache				= true;
-    private			$cacheRead			= false;
-    private			$cacheDir			= null;
-    private			$cacheMaxAge		= 0;
-    private			$cacheMaxLockTime	= 60;
-    private			$cacheMaxWaitTime	= 90;
+    private     $debug                 = false;
+    private     $cache                 = true;
+    private     $cacheRead             = false;
+    private     $cacheDir              = null;
+    private     $cacheMaxAge           = 0;
+    private     $cacheMaxLockTime      = 60;
 
-    private			$index				= array();
-    private			$include			= array();
-    private			$exclude			= array();
-    private			$ignore				= array();
+    private     $index                 = array();
+    private     $include               = array();
+    private     $exclude               = array();
+    private     $ignore                = array();
 
-    private			$missingRefreshInterval	= 60;
+    private     $missingRefreshTime    = 60;
 
-    private			$configDefaults	= array(
-        'debug'			=> false,
-        'cache'			=> true,
-        'cacheDir'		=> '/tmp',
-        'cacheMaxAge'	=> 0,
-        'cacheMethod'	=> 'include',
-        'exclude'		=> array(),
-        'include'		=> array(),
-        'ignore'		=> array(),
+    private     $configDefaults        = array(
+        'debug'            => false,
+        'cache'            => true,
+        'cacheDir'         => '/tmp',
+        'cacheMaxAge'      => 0,
+        'cacheMethod'      => 'include',
+        'exclude'          => array(),
+        'include'          => array(),
+        'ignore'           => array(),
     );
 
     public function __construct($config = false)
@@ -185,10 +183,10 @@ class AutoLoader
 
         $this->debug("creating lock file $lockFile");
 
-        $lockText		= "opensourceame AutoLoader\n\n";
-        $lockText	   .= "Version: " . self::version 		. "\n";
-        $lockText	   .= "PID:     " . getmypid() 			. "\n";
-        $lockText	   .= "Date:    " . date("Y-m-d H:i:s") . "\n";
+        $lockText        = "opensourceame AutoLoader\n\n";
+        $lockText       .= "Version: " . self::version         . "\n";
+        $lockText       .= "PID:     " . getmypid()             . "\n";
+        $lockText       .= "Date:    " . date("Y-m-d H:i:s") . "\n";
 
         return file_put_contents($lockFile, $lockText);
     }
@@ -204,12 +202,12 @@ class AutoLoader
             return true;
         }
 
-        $cacheFile 	= $this->getCacheFileName();
-        $lockFile	= $this->getCacheLockFileName();
+        $cacheFile     = $this->getCacheFileName();
+        $lockFile      = $this->getCacheLockFileName();
 
         $cacheContent  = "<?php\n";
-        $cacheContent .= '$version = "'	. self::version							. "\";\n";
-        $cacheContent .= '$index   = ' . var_export($this->index, true) 		. ";\n";
+        $cacheContent .= '$version = "'    . self::version                            . "\";\n";
+        $cacheContent .= '$index   = ' . var_export($this->index, true)         . ";\n";
 
         if (! file_put_contents($cacheFile, $cacheContent)) {
             $this->debug("could not write cache to $cacheFile");
@@ -261,8 +259,8 @@ class AutoLoader
             return false;
         }
 
-        $this->index			= $index;
-        $this->cacheRead 		= true;
+        $this->index            = $index;
+        $this->cacheRead        = true;
 
         $this->debug("read cache from $cacheFile");
         $this->debug(count($this->index) . " classes loaded");
@@ -301,7 +299,7 @@ class AutoLoader
 
         foreach ($this->include as $path) {
 
-            $files 	= $this->globRecursive("$path/*.php");
+            $files     = $this->globRecursive("$path/*.php");
 
             foreach ($files as $file) {
 
@@ -496,8 +494,8 @@ class AutoLoader
 
                 while (! file_exists($this->getCacheFileName())) {
 
-                    $lockTime 	= filemtime($lockFile);
-                    $lockAge	= time() - $lockTime;
+                    $lockTime     = filemtime($lockFile);
+                    $lockAge    = time() - $lockTime;
 
                     if ($lockAge > $this->cacheMaxLockTime) {
 
@@ -551,16 +549,10 @@ class AutoLoader
     public function getCacheFileName()
     {
         $tmp = array(
-            'in'	=> $this->include,
-            'ex'	=> $this->exclude,
-            'ign'	=> $this->ignore,
+            'in'    => $this->include,
+            'ex'    => $this->exclude,
+            'ign'   => $this->ignore,
         );
-
-        if ($this->cacheMethod == 'include') {
-            $ext = 'php';
-        } else {
-            $ext = 'cache';
-        }
 
         return $this->cacheDir . "/autoloader." . md5(serialize($tmp)) . ".$ext";
     }
@@ -583,13 +575,13 @@ class AutoLoader
      */
     public function readDirectory($path)
     {
-        $path	= realpath($path);
+        $path    = realpath($path);
 
         $this->debug("reading $path");
 
         $this->pathsRead[] = $path;
 
-        $files 	= $this->globRecursive("$path/*");
+        $files     = $this->globRecursive("$path/*");
 
         foreach ($files as $file) {
 
@@ -614,10 +606,10 @@ class AutoLoader
      */
     private function parseFile($filename)
     {
-// 		$this->debug("parsing $filename");
+//         $this->debug("parsing $filename");
 
-        $content 	= file($filename);
-        $namespace	= null;
+        $content     = file($filename);
+        $namespace    = null;
 
         foreach ($content as $line) {
 
@@ -657,17 +649,17 @@ class AutoLoader
     {
         $class = $this->formatClassName($className);
 
-        $entity 					= new \opensourceame\AutoLoader\Entity;
-        $entity->name				= $className;
-        $entity->location			= null;
-        $entity->namespace			= null;
-        $entity->status				= self::MISSING;
-        $entity->lastCheckTime		= time();
-        $entity->lastCheckCount		= 1;
+        $entity                     = new \opensourceame\AutoLoader\Entity;
+        $entity->name               = $className;
+        $entity->location           = null;
+        $entity->namespace          = null;
+        $entity->status             = self::MISSING;
+        $entity->lastCheckTime      = time();
+        $entity->lastCheckCount     = 1;
 
-        $this->index[$class]		= $entity;
+        $this->index[$class]        = $entity;
 
-        $this->missing[$class]		= &$this->index[$class];
+        $this->missing[$class]      = &$this->index[$class];
     }
 
     private function addFoundClass($filename, $namespace, $className)
@@ -688,20 +680,15 @@ class AutoLoader
             return false;
         }
 
-        $entity 					= new \opensourceame\AutoLoader\Entity;
-        $entity->name				= $className;
-        $entity->location			= $filename;
-        $entity->namespace			= $namespace;
-        $entity->status				= self::FOUND;
-        $entity->lastCheckTime		= time();
-        $entity->lastCheckCount		= 1;
+        $entity                     = new \opensourceame\AutoLoader\Entity;
+        $entity->name               = $className;
+        $entity->location           = $filename;
+        $entity->namespace          = $namespace;
+        $entity->status             = self::FOUND;
+        $entity->lastCheckTime      = time();
+        $entity->lastCheckCount     = 1;
 
-/*
-        if ($class::version) {
-            $entity->version	= $class::version;
-        }
-*/
-        $this->index[$class]		= $entity;
+        $this->index[$class]        = $entity;
 
         return true;
     }
