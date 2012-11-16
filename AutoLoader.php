@@ -337,7 +337,7 @@ class AutoLoader
 
             // if we've passed the time to try a refresh then search
 
-            if ($entity->lastCheckTime < (time() - $this->missingRefreshInterval)) {
+            if ($entity->lastCheckTime < (time() - $this->missingRefreshTime)) {
 
                 return $this->searchForMissingClass($className);
             }
