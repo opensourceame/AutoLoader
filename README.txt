@@ -10,7 +10,7 @@ Version 3 uses multiple classes and changes file names. Please set up as follows
 
 require_once '/path/to/opensourceame/AutoLoader/AutoLoader.php';
 
-$autoloader = new \opensourceame\AutoLoader\AutoLoader;
+$autoloader = new \opensourceame\AutoLoader;
 $autoloader->readConfigFile('/path/to/autoloader.yaml');
 $autoloader->init();
 
