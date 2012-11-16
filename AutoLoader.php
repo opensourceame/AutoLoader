@@ -10,33 +10,7 @@
  * @version            3.0.0
  */
 
-namespace opensourceame\AutoLoader;
-
-class Entity
-{
-    public            $location;
-    public            $status;
-    public            $lastCheckTime;
-    public            $lastCheckCount;
-
-    /**
-     * Set the properties of the entity
-     *
-     * @param array $data
-     * @return \opensourceame\AutoLoader\Entity
-     */
-    static function __set_state(array $data) {
-
-        $entity = new Entity;
-
-        foreach($data as $key => $val) {
-            $entity->key = $val;
-        }
-
-        return $entity;
-    }
-}
-
+namespace opensourceame;
 
 class AutoLoader
 {
@@ -91,6 +65,9 @@ class AutoLoader
         }
 
         spl_autoload_register('\opensourceame\AutoLoader\AutoLoader::load');
+
+        // require the entity file
+        require_once __DIR__ . '/Entity.php';
     }
 
     /**
@@ -660,6 +637,8 @@ class AutoLoader
         $this->index[$class]        = $entity;
 
         $this->missing[$class]      = &$this->index[$class];
+
+        return true;
     }
 
     private function addFoundClass($filename, $namespace, $className)
