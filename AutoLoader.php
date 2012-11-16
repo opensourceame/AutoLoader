@@ -531,7 +531,7 @@ class AutoLoader
             'ign'   => $this->ignore,
         );
 
-        return $this->cacheDir . "/autoloader." . md5(serialize($tmp)) . ".$ext";
+        return $this->cacheDir . "/autoloader." . md5(serialize($tmp)) . ".php";
     }
 
     /**
