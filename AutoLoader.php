@@ -64,7 +64,7 @@ class AutoLoader
             $this->readConfigFile($config);
         }
 
-        spl_autoload_register('\opensourceame\AutoLoader\AutoLoader::load');
+        spl_autoload_register('\opensourceame\AutoLoader::load');
 
         // require the entity file
         require_once __DIR__ . '/Entity.php';
