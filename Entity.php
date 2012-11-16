@@ -20,7 +20,7 @@ class Entity
 		$entity = new Entity;
 
 		foreach($data as $key => $val) {
-			$entity->key = $val;
+			$entity->$key = $val;
 		}
 
 		return $entity;
