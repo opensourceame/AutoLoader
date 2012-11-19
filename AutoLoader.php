@@ -106,6 +106,8 @@ class AutoLoader
 
         $this->readConfigArray($config);
 
+        $this->debug("read config from $configFile");
+
         return true;
 
     }
