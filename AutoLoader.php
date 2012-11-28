@@ -14,7 +14,7 @@ namespace opensourceame;
 
 class AutoLoader
 {
-    const       version                = '3.0.0';
+    const       version                = '3.0.1';
     const       FOUND                  = 1;
     const       MISSING                = 2;
 
@@ -40,14 +40,14 @@ class AutoLoader
     private     $missingRefreshTime    = 60;
 
     private     $configDefaults        = array(
-        'debug'            => false,
-        'cache'            => true,
-        'cacheDir'         => '/tmp',
-        'cacheMaxAge'      => 0,
-        'cacheMethod'      => 'include',
-        'exclude'          => array(),
-        'include'          => array(),
-        'ignore'           => array(),
+        'debug'            		=> false,
+        'cache'            		=> true,
+        'cacheDir'         		=> '/tmp',
+        'cacheMaxAge'      		=> 0,
+        'exclude'          		=> array(),
+        'include'          		=> array(),
+        'ignore'           		=> array(),
+    	'missinRefreshTime'		=> 60,
     );
 
     public function __construct($config = false)
